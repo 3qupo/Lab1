@@ -1,164 +1,192 @@
-#include "BigNumber.h"
+#include <iostream>
+#include <vector>
+#include <algorithm>
+#include <iomanip>
 
-// Конструктор для преобразования строки в число
-BigNumber::BigNumber(const std::string& str)
+
+// по умолчанию (инициализация нулями)
+// занесение числа
+// копирование из числа
+// оператор присваивания
+
+using namespace std;
+
+struct  BigNumber
 {
-    is_negative = false;
-    int start = 0;
+    static const long long BASE = 1e9;             //размер разряда
+    static const long long SIZE = 100000000;       //количество вмещаемых разрядов
 
-    if (str[0] == '-')
-    {
-        is_negative = true;
-        start = 1;  // Пропускаем знак
+    unsigned long long digits[SIZE];
+
+    BigNumber()                                    //стандартный конструктор НУЖНО ОСТАВИТЬ
+    {                                  
+        for (int i = 0; i < SIZE; i++) {
+            digits[i] = 0;
+        }
     }
 
-    length = str.length() - start;
-    for (int i = 0; i < length; i++)
+    BigNumber(long long BigNumber)                        //конструктор для преобразования обычного числа в длинное НУЖНО ОСТАВИТЬ
     {
-        number[i] = str[str.length() - i - 1] - '0';  // Записываем число в обратном порядке
-    }
-}
+        /*for (int i = 0; i < SIZE; i++) {
+            digits[i] = 0;
+        }*/
 
-// Функция сравнения двух чисел
-int BigNumber::Compare(const char* num1, int len1, const char* num2, int len2)
-{
-    if (len1 != len2) return len1 > len2 ? 1 : -1;
-    for (int i = len1 - 1; i >= 0; --i)
-    {
-        if (num1[i] != num2[i]) return num1[i] > num2[i] ? 1 : -1;
-    }
-    return 0;
-}
-
-// Преобразование массива символов в блоки long long
-void BigNumber::convertCharArrayToBlocks(const char* number, int length, long long* blocks, int& blockCount)
-{
-    blockCount = (length + BLOCK_SIZE - 1) / BLOCK_SIZE;
-
-    for (int i = 0; i < blockCount; ++i)
-    {
-        blocks[i] = 0;
-        int start = length - (i + 1) * BLOCK_SIZE;
-        int end = length - i * BLOCK_SIZE;
-
-        if (start < 0) start = 0;
-        for (int j = start; j < end; ++j)
+        int next = 0;
+        while (BigNumber)
         {
-            blocks[i] = blocks[i] * 10 + (number[j] - '0');
+            digits[next++] = BigNumber % BASE;
+            BigNumber /= BASE;
+        }
+    }
+
+    BigNumber(BigNumber& other)
+    {               //конструктор копирования НУЖНО ОСТАВИТЬ
+        for (int i = 0; i < SIZE; i++) {
+            digits[i] = other.digits[i];
+        }
+    }
+
+    BigNumber& operator = (BigNumber& other) {    //оператор присваивания
+        for (int i = 0; i < SIZE; i++) {
+            digits[i] = other.digits[i];
+        }
+        return *this;
+    }
+
+    void operator+=(BigNumber& other) {
+        for (int i = 0; i < SIZE; i++) {        //сначала сложим числа поразрядно,
+            digits[i] += other.digits[i];       //игнорируя переполнения
+        }
+
+        for (int i = 0; i < SIZE - 1; i++) {    //а затем поочередно выполним переносы
+            if (digits[i] >= BASE) {            //для каждого разряда
+                digits[i] -= BASE;
+                digits[i + 1]++;
+            }
+        }
+    }
+
+};
+
+// определяем длину массива суммы
+unsigned long long Addition()
+{
+    int size_a;
+    int size_b;
+    unsigned long long length;
+    int b[1000000];
+    int a[1000000];
+
+    if (size_a > size_b) length = size_a + 1;
+    else length = size_b + 1;
+
+    for (int ix = 0; ix < length; ix++)
+    {
+        b[ix] += a[ix]; // суммируем последние разряды чисел
+        b[ix + 1] += (b[ix] / 10); // если есть разряд для переноса, переносим его в следующий разряд
+        b[ix] %= 10; // если есть разряд для переноса он отсекается
+    }
+
+    if (b[length - 1] == 0)
+    length--;
+
+    return length;
+}
+
+unsigned long long Subtraction()
+{
+    int k = 3; // если к == 3, значит числа одинаковой длинны
+    int length;
+    int size_a;
+    int size_b;
+    int a[1000000];
+    int b[1000000];
+
+    length = size_a;
+    if (size_a > size_b)
+    {
+        length = size_a;
+        k = 1; // если к == 1, значит первое число длиннее второго
+    }
+    else
+    {
+        if (size_b > size_a)
+        {
+            length = size_b;
+            k = 2; // если к == 2, значит второе число длиннее первого
+        }
+        else // если числа одинаковой длинны, то необходимо сравнить их веса
+        {
+            for (int ix = 0; ix < length;) // поразрядное сравнение весов чисел
+            {
+                if (a[ix] > b[ix]) // если разряд первого числа больше
+                {
+                    k = 1; // значит первое число длиннее второго
+                    break; // выход из цикла for
+                }
+
+                if (b[ix] > a[ix]) // если разряд второго числа больше
+                {
+                    k = 2; // значит второе число длиннее первого
+                    break; // выход из цикла for
+                }
+            }
         }
     }
 }
 
-// Вывод блоков числа
-void BigNumber::printBlocks(const long long* blocks, int blockCount)
+int Difference(int* x, int* y, int* z, int length)
 {
-    std::cout << blocks[blockCount - 1];
-    for (int i = blockCount - 2; i >= 0; --i)
+    for (int ix = 0; ix < (length - 1); ix++) // проход по всем разрядам числа, начиная с последнего, не доходя до первого
     {
-        std::cout << std::setfill('0') << std::setw(BLOCK_SIZE) << blocks[i];
+        if (ix < (length - 1)) // если текущий разряд чисел не первый
+        {
+            x[ix + 1]--; // в следующуем разряде большего числа занимаем 1.
+            z[ix] += 10 + x[ix]; // в ответ записываем сумму значения текущего разряда большего числа и 10-ти
+
+        }
+        else  // если текущий разряд чисел - первый
+        {
+            z[ix] += x[ix]; // в ответ суммируем значение текущего разряда большего числа
+        }
+
+        z[ix] -= y[ix]; // вычитаем значение текущего разряда меньшего числа
+
+        if (z[ix] / 10 > 0) // если значение в текущем разряде двухразрядное
+        {
+            z[ix + 1]++; // переносим единицу в старший разряд
+            z[ix] %= 10; // в текущем разряде отсекаем ее
+        }
     }
-    std::cout << std::endl;
+
+    return x - y;
 }
 
-// Сложение
-void BigNumber::Addition(const char* num1, int len1, const char* num2, int len2, char* result, int& result_len)
+int Multiplication()
 {
-    int carry = 0;
-    result_len = std::max(len1, len2);
+    int length;
+    int size_a = 0;
+    int size_b = 0;
+    int a[1000000];
+    int b[1000000];
+    int c[1000000];
 
-    for (int i = 0; i < result_len; ++i)
+    length = size_a + size_b + 1;
+
+    for (int ix = 0; ix < size_a; ix++)
     {
-        int digit1 = i < len1 ? num1[i] : 0;
-        int digit2 = i < len2 ? num2[i] : 0;
-        int sum = digit1 + digit2 + carry;
-        result[i] = sum % 10;
-        carry = sum / 10;
-    }
-
-    if (carry) result[result_len++] = carry;
-}
-
-// Вычитание
-void BigNumber::Subtraction(const char* num1, int len1, const char* num2, int len2, char* result, int& result_len)
-{
-    int borrow = 0;
-    result_len = len1;
-
-    for (int i = 0; i < result_len; ++i)
-    {
-        int digit1 = num1[i];
-        int digit2 = i < len2 ? num2[i] : 0;
-        int diff = digit1 - digit2 - borrow;
-
-        if (diff < 0)
+        for (int jx = 0; jx < size_b; jx++)
         {
-            diff += 10;
-            borrow = 1;
+            c[ix + jx - 1] += a[ix] * b[jx];
         }
-        else borrow = 0;
-
-        result[i] = diff;
     }
 
-    while (result_len > 1 && result[result_len - 1] == 0) result_len--;
-}
-
-// Умножение
-void BigNumber::Multiplication(const char* num1, int len1, const char* num2, int len2, char* result, int& result_len)
-{
-    result_len = len1 + len2;
-    memset(result, 0, result_len);
-
-    for (int i = 0; i < len1; ++i)
+    for (int ix = 0; ix < length; ix++)
     {
-        int carry = 0;
-        for (int j = 0; j < len2; ++j)
-        {
-            int product = num1[i] * num2[j] + result[i + j] + carry;
-            result[i + j] = product % 10;
-            carry = product / 10;
-        }
-        result[i + len2] += carry;
+        c[ix + 1] += c[ix] / 10;
+        c[ix] %= 10;
     }
 
-    while (result_len > 1 && result[result_len - 1] == 0) result_len--;
-}
+    while (c[length] == 0) length--;
 
-// Деление
-void BigNumber::Division(const char* num1, int len1, const char* num2, int len2, char* result, int& result_len)
-{
-    char temp[MAX_DIGITS] = { 0 };
-    int temp_len = 0;
-    result_len = 0;
-
-    for (int i = len1 - 1; i >= 0; --i)
-    {
-        for (int j = temp_len; j > 0; --j)
-        {
-            temp[j] = temp[j - 1];
-        }
-        temp[0] = num1[i];
-        temp_len++;
-
-        while (temp_len > 1 && temp[temp_len - 1] == 0) temp_len--;
-
-        int quotient = 0;
-        char prod[MAX_DIGITS] = { 0 };
-        int prod_len = 0;
-
-        while (Compare(temp, temp_len, num2, len2) >= 0)
-        {
-            Subtraction(temp, temp_len, num2, len2, prod, prod_len);
-            memcpy(temp, prod, prod_len);
-            temp_len = prod_len;
-            quotient++;
-        }
-        result[result_len++] = quotient;
-    }
-    while (result_len > 1 && result[result_len - 1] == 0) result_len--;
-
-    for (int i = 0; i < result_len / 2; ++i)
-    {
-        std::swap(result[i], result[result_len - i - 1]);
-    }
 }
