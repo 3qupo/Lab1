@@ -374,90 +374,39 @@ public:
 		return *this;
 	}
 
+	void fermatFactorization(LongNumber& a) {
 
-	// ААААААААААААААААААААААААААААААААААААААААААААААААААААААААААААААААААААААААААААААААААААААААААААААААААААААААААААААААААААААаа
+		LongNumber h = 0;
+		LongNumber y = 0;
+		LongNumber mn1 = 0;
+		LongNumber mn2 = 0;
+		LongNumber Rx = 1;
+		LongNumber Ry = 1;
+		LongNumber h_squared = 0;
+		LongNumber y_squared = 0;
+		LongNumber Rxy = h_squared - y_squared - a;
 
-	// Метод для извлечения целой части квадратного корня
-	LongNumber sqrtF(LongNumber& x)
-	{
-		if (x < LongNumber(0))
-		{
-			throw std::invalid_argument("Negative argument.");
+		while (Rxy != 0){
+			do {
+				if (Rxy > 0) {
+					Rxy = Rxy - Ry;
+					y = y + 1;
+					y_squared = y * y;
+					Ry = Ry + 2;
+				}
+				else {
+					h = h + 1;
+					h_squared = h * h;
+					Rx = Rx + 2;
+				}
+				Rxy = h_squared - y_squared - a;
+				mn1 = (Rx - Ry) / 2;
+				mn2 = (Rx + Ry) / 2 - 1;
+			} while (a != (mn1 * mn2));
 		}
 
-		if (x == LongNumber(0) || x == LongNumber(1))
-		{
-			return x;
-		}
-
-		LongNumber y = x / LongNumber(2);
-
-		while (y > x / y)
-		{
-			y = (x / y + y) / LongNumber(2);
-		}
-
-		return y;
-	}
-
-	// Метод для нахождения верхней границы квадратного корня
-	LongNumber sqrtC(LongNumber& x)
-	{
-		LongNumber y = sqrtF(x);
-
-		if (x == y * y)
-		{
-			return y;
-		}
-		else
-		{
-			return y + LongNumber(1);
-		}
-	}
-
-	/*void FermatFactors(LongNumber& N)
-	{
-		if (N % 2 == 0) return;
-		LongNumber a = sqrtC(N);
-		LongNumber b;
-		LongNumber b1;
-		if (a * a == N)
-		{
-			a.print();
-			a.print();
-		}
-		while (true)
-		{
-			b1 = a * a - N;
-			b = sqrtF(b1);
-			if (b * b == b1) break;
-			else a = a + LongNumber(1);
-		}
-
-		(a - b).print();
-		(a + b).print();
-	}*/
-
-	// АААААААААААААААААААААААААААААААААААААААААААААААААААААААААААААААААААААААААААААААААААААААААААААААААААААААААААААААААААААААААа
-
-	void fermatFactorization(LongNumber& N) {
-		LongNumber x = squareRoot(N) + LongNumber(1);  // Начинаем с квадратного корня
-		LongNumber y;
-
-		while (true) {
-			LongNumber xSquared = x * x;
-			LongNumber diff = xSquared - N;
-			y = squareRoot(diff);  // Пытаемся найти квадратный корень из разности
-
-			if (y * y == diff) {  // Если разность — это точный квадрат
-				LongNumber factor1 = x + y;
-				LongNumber factor2 = x - y;
-				cout << "Factors found: " << factor1.ConvertToString() << " and " << factor2.ConvertToString() << endl;
-				break;  // Выход, как только нашли факторизацию
-			}
-
-			x = x + LongNumber(1);  // Увеличиваем x
-		}
+		mn1.print();
+		mn2.print();
 	}
 
 	void print() const
@@ -472,7 +421,7 @@ int main()
 	// Засекаем время начала
 	auto start = high_resolution_clock::now();
 
-	LongNumber ln("51"); // Пример длинного числа
+	LongNumber ln("101"); // Пример длинного числа
 	ln.fermatFactorization(ln); // Вызов метода факторизации
 
 	//ln.FermatFactors(ln);
