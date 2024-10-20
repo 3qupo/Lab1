@@ -293,7 +293,7 @@ public:
 		return result;
 	}
 
-	void FromStringToNumber(string str) 
+	void FromStringToNumber(string str)
 	{
 		// Задаем размер, равный длине строки
 		size = str.size();
@@ -305,9 +305,9 @@ public:
 		}
 	}
 
-	
-	 // Преобразование числа в строку (для примера используется только положительное число)
-	void FromNumberToString(int Number) 
+
+	// Преобразование числа в строку (для примера используется только положительное число)
+	void FromNumberToString(int Number)
 	{
 		string str = to_string(Number);  // Преобразуем число в строку
 		size = str.size();
@@ -415,7 +415,7 @@ public:
 		}
 	}
 
-	void FermatFactors(LongNumber& N)
+	/*void FermatFactors(LongNumber& N)
 	{
 		if (N % 2 == 0) return;
 		LongNumber a = sqrtC(N);
@@ -433,10 +433,10 @@ public:
 			if (b * b == b1) break;
 			else a = a + LongNumber(1);
 		}
-		
+
 		(a - b).print();
 		(a + b).print();
-	}
+	}*/
 
 	// АААААААААААААААААААААААААААААААААААААААААААААААААААААААААААААААААААААААААААААААААААААААААААААААААААААААААААААААААААААААААа
 
@@ -472,10 +472,10 @@ int main()
 	// Засекаем время начала
 	auto start = high_resolution_clock::now();
 
-	LongNumber ln("23151235123"); // Пример длинного числа
-	//ln.fermatFactorization(ln); // Вызов метода факторизации
+	LongNumber ln("51"); // Пример длинного числа
+	ln.fermatFactorization(ln); // Вызов метода факторизации
 
-	ln.FermatFactors(ln);
+	//ln.FermatFactors(ln);
 
 	// Засекаем время окончания
 	auto end = high_resolution_clock::now();
