@@ -1,6 +1,5 @@
 #include <iostream>
 #include <string>
-#include <algorithm>
 #include <chrono>	// for time
 #include <cstdlib> // Для rand и srand
 
@@ -400,7 +399,7 @@ public:
 
 	int endelim()
 	{
-		int b = num[0];
+		int b = num[0] % 2;
 		return b;
 	}
 
@@ -445,11 +444,11 @@ public:
 
 	void fermatFactorization(LongNumber& n)
 	{
-		/*if (n % 2 == 0)
+		if (n.endelim() == 0)
 		{
 			cout << "Должно быть нечетное число" << endl;
 			return;
-		}*/
+		}
 		// Инициализация переменных
 		LongNumber x = n.sqrt1(n);	// Приближенное значение для корня из n
 		if (x * x == n)
@@ -492,7 +491,7 @@ public:
 
 	void print() const
 	{
-		for (size_t i = 0; i < size; ++i) cout << num[i];
+		for (size_t i = size; i > 0; --i) cout << num[i-1];
 		cout << endl;
 	}
 };
@@ -503,11 +502,11 @@ int main()
 
 	auto start = high_resolution_clock::now();
 
-	LongNumber a = 1940031;
+	LongNumber a;
 	LongNumber result;
 
-	/*a.generateRandomNumber(5);
-	a.print();*/
+	a.generateRandomNumber(5);
+	a.print();
 
 	result.fermatFactorization(a);
 	// Засекаем время окончания
