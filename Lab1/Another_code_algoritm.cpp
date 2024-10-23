@@ -9,52 +9,52 @@ using namespace std::chrono;
 class LongNumber
 {
 private:
-	int* num;
+	int* number;
 	int size;
 
 public:
 	LongNumber()
 	{
-		num = nullptr;
+		number = nullptr;
 		size = 0;
 	}
 
 	LongNumber(string str)
 	{
-		num = nullptr;
+		number = nullptr;
 		size = 0;
 		fromString(str);
 	}
 
 	LongNumber(int n)
 	{
-		num = nullptr;
+		number = nullptr;
 		size = 0;
 		fromInt(n);
 	}
 
 	LongNumber(const LongNumber& other)
 	{
-		num = new int[other.size];
+		number = new int[other.size];
 
-		copy(other.num, other.num + other.size, num);
+		copy(other.number, other.number + other.size, number);
 		size = other.size;
 	}
 
 	~LongNumber()
 	{
-		delete[] num;
+		delete[] number;
 	}
 
 	LongNumber& operator=(const LongNumber& other)
 	{
 		if (this != &other)
 		{
-			delete[] num;
+			delete[] number;
 
-			num = new int[other.size];
+			number = new int[other.size];
 
-			copy(other.num, other.num + other.size, num);
+			copy(other.number, other.number + other.size, number);
 			size = other.size;
 		}
 
@@ -65,7 +65,7 @@ public:
 	{
 		if (other.size == 0)
 		{
-			if (this->size == 0 || (this->size == 1 && this->num[0] == 0))
+			if (this->size == 0 || (this->size == 1 && this->number[0] == 0))
 			{
 				return true;
 			}
@@ -74,7 +74,7 @@ public:
 		}
 		else if (this->size == 0)
 		{
-			if (other.size == 1 && other.num[0] == 0)
+			if (other.size == 1 && other.number[0] == 0)
 			{
 				return true;
 			}
@@ -88,7 +88,7 @@ public:
 
 		for (size_t i = 0; i < other.size; i++)
 		{
-			if (other.num[i] != this->num[i]) return false;
+			if (other.number[i] != this->number[i]) return false;
 		}
 
 		return true;
@@ -115,9 +115,9 @@ public:
 
 		for (auto i = static_cast<long long int> (other.size - 1); i >= 0; i--)
 		{
-			if (other.num[i] != this->num[i])
+			if (other.number[i] != this->number[i])
 			{
-				return this->num[i] < other.num[i];
+				return this->number[i] < other.number[i];
 			}
 		}
 
@@ -151,7 +151,7 @@ public:
 		int carry = 0;
 
 		result.size = max(size, other.size) + 1;
-		result.num = new int[result.size];
+		result.number = new int[result.size];
 
 		for (int i = 0; i < max(size, other.size); i++)
 		{
@@ -159,21 +159,21 @@ public:
 
 			if (i < size)
 			{
-				sum += num[i];
+				sum += number[i];
 			}
 
 			if (i < other.size)
 			{
-				sum += other.num[i];
+				sum += other.number[i];
 			}
 
-			result.num[i] = sum % 10;
+			result.number[i] = sum % 10;
 			carry = sum / 10;
 		}
 
 		if (carry != 0)
 		{
-			result.num[max(size, other.size)] = carry;
+			result.number[max(size, other.size)] = carry;
 		}
 		else
 		{
@@ -187,19 +187,19 @@ public:
 	{
 		LongNumber result;
 		result.size = max(size, other.size);
-		result.num = new int[result.size]();
+		result.number = new int[result.size]();
 		int borrow = 0;
 		for (int i = 0; i < result.size; i++)
 		{
 			int diff = borrow;
 			if (i < size)
 			{
-				diff += num[i];
+				diff += number[i];
 			}
 
 			if (i < other.size)
 			{
-				diff -= other.num[i];
+				diff -= other.number[i];
 			}
 
 			if (diff < 0)
@@ -212,10 +212,10 @@ public:
 				borrow = 0;
 			}
 
-			result.num[i] = diff;
+			result.number[i] = diff;
 		}
 
-		while (result.size > 1 && result.num[result.size - 1] == 0)
+		while (result.size > 1 && result.number[result.size - 1] == 0)
 		{
 			result.size--;
 		}
@@ -227,10 +227,10 @@ public:
 	{
 		LongNumber result;
 		result.size = size + other.size;
-		result.num = new int[size + other.size];
+		result.number = new int[size + other.size];
 		for (int i = 0; i < (size + other.size); i++)
 		{
-			result.num[i] = 0;
+			result.number[i] = 0;
 		}
 
 		for (int i = 0; i < size; i++)
@@ -238,19 +238,19 @@ public:
 			int carry = 0;
 			for (int j = 0; j < other.size; j++)
 			{
-				int product = num[i] * other.num[j] +
-					result.num[i + j] + carry;
-				result.num[i + j] = product % 10;
+				int product = number[i] * other.number[j] +
+					result.number[i + j] + carry;
+				result.number[i + j] = product % 10;
 				carry = product / 10;
 			}
 
 			if (carry > 0)
 			{
-				result.num[i + other.size] += carry;
+				result.number[i + other.size] += carry;
 			}
 		}
 
-		while (result.size > 1 && result.num[result.size - 1] == 0)
+		while (result.size > 1 && result.number[result.size - 1] == 0)
 		{
 			result.size--;
 		}
@@ -260,7 +260,7 @@ public:
 
 	LongNumber operator/(const LongNumber& other) const
 	{
-		if (other.size == 0 || (other.size == 1 && other.num[0] == 0))
+		if (other.size == 0 || (other.size == 1 && other.number[0] == 0))
 		{
 			throw runtime_error("Division by zero");
 		}
@@ -269,7 +269,7 @@ public:
 		LongNumber current;
 		current.size = 0;
 		result.size = this->size;
-		result.num = new int[result.size]();
+		result.number = new int[result.size]();
 
 		for (int i = this->size - 1; i >= 0; i--)
 		{
@@ -279,15 +279,15 @@ public:
 			int* newNum = new int[temp.size];
 			for (int j = 0; j < temp.size - 1; j++)
 			{
-				newNum[j] = current.num[j];
+				newNum[j] = current.number[j];
 			}
 
-			newNum[temp.size - 1] = this->num[i];
-			delete[] current.num;
-			current.num = newNum;
+			newNum[temp.size - 1] = this->number[i];
+			delete[] current.number;
+			current.number = newNum;
 
 			// Убираем ведущие нули
-			while (current.size > 1 && current.num[current.size - 1] == 0)
+			while (current.size > 1 && current.number[current.size - 1] == 0)
 			{
 				current.size--;
 			}
@@ -300,11 +300,11 @@ public:
 				count++;
 			}
 
-			result.num[i] = count;
+			result.number[i] = count;
 		}
 
 		// Убираем ведущие нули в результате
-		while (result.size > 1 && result.num[result.size - 1] == 0)
+		while (result.size > 1 && result.number[result.size - 1] == 0)
 		{
 			result.size--;
 		}
@@ -314,7 +314,7 @@ public:
 
 	LongNumber operator%(const LongNumber& other) const
 	{
-		if (other.size == 0 || (other.size == 1 && other.num[0] == 0))
+		if (other.size == 0 || (other.size == 1 && other.number[0] == 0))
 		{
 			throw runtime_error("Division by zero");
 		}
@@ -330,14 +330,14 @@ public:
 			int* newNum = new int[temp.size];
 			for (int j = 0; j < temp.size - 1; j++)
 			{
-				newNum[j] = current.num[j];
+				newNum[j] = current.number[j];
 			}
-			newNum[temp.size - 1] = this->num[i];
-			delete[] current.num;
-			current.num = newNum;
+			newNum[temp.size - 1] = this->number[i];
+			delete[] current.number;
+			current.number = newNum;
 
 			// Убираем ведущие нули
-			while (current.size > 1 && current.num[current.size - 1] == 0)
+			while (current.size > 1 && current.number[current.size - 1] == 0)
 			{
 				current.size--;
 			}
@@ -350,7 +350,7 @@ public:
 		}
 
 		// Убираем ведущие нули
-		while (current.size > 1 && current.num[current.size - 1] == 0)
+		while (current.size > 1 && current.number[current.size - 1] == 0)
 		{
 			current.size--;
 		}
@@ -362,19 +362,19 @@ public:
 	void fromString(const string& str)
 	{
 		size = str.size();
-		num = new int[size];
+		number = new int[size];
 		for (int i = 0; i < str.size(); i++)
 		{
-			num[i] = str[i] - '0';
+			number[i] = str[i] - '0';
 		}
 
 		int start = 0;
 		int end = size - 1;
 		while (start < end)
 		{
-			int temp = num[start];
-			num[start] = num[end];
-			num[end] = temp;
+			int temp = number[start];
+			number[start] = number[end];
+			number[end] = temp;
 			start++;
 			end--;
 		}
@@ -391,7 +391,7 @@ public:
 		string str;
 		for (int i = size - 1; i >= 0; i--)
 		{
-			str += to_string(num[i]);
+			str += to_string(number[i]);
 		}
 
 		return str;
@@ -399,7 +399,7 @@ public:
 
 	int endelim()
 	{
-		int b = num[0] % 2;
+		int b = number[0] % 2;
 		return b;
 	}
 
@@ -421,9 +421,9 @@ public:
 
 	void generateRandomNumber(int length)
 	{
-		delete[] num; // Очищаем память для нового числа
+		delete[] number; // Очищаем память для нового числа
 		size = length;
-		num = new int[size];
+		number = new int[size];
 
 		// Инициализируем генератор случайных чисел
 		srand(time(0));
@@ -431,13 +431,13 @@ public:
 		// Генерация случайного длинного числа
 		for (int i = 0; i < size; i++)
 		{
-			num[i] = rand() % 10; // Генерация цифры от 0 до 9
+			number[i] = rand() % 10; // Генерация цифры от 0 до 9
 		}
 
 		// Проверяем, чтобы старшая цифра (последняя в массиве) не была нулем
-		while (num[size - 1] == 0)
+		while (number[size - 1] == 0)
 		{
-			num[size - 1] = rand() % 9 + 1; // Генерация цифры от 1 до 9
+			number[size - 1] = rand() % 9 + 1; // Генерация цифры от 1 до 9
 		}
 	}
 
@@ -491,7 +491,7 @@ public:
 
 	void print() const
 	{
-		for (size_t i = size; i > 0; --i) cout << num[i-1];
+		for (size_t i = size; i > 0; --i) cout << number[i-1];
 		cout << endl;
 	}
 };
