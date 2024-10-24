@@ -23,22 +23,23 @@ public:
 	{
 		number = nullptr;
 		size = 0;
-		fromString(str);
+		fromStringToNumber(str);
 	}
 
 	LongNumber(int n)
 	{
 		number = nullptr;
 		size = 0;
-		fromInt(n);
+		fromNumberToString(n);
 	}
 
 	LongNumber(const LongNumber& other)
 	{
-		number = new int[other.size];
-
-		copy(other.number, other.number + other.size, number);
 		size = other.size;
+		number = new int[size];
+		for (size_t i = 0; i < size; i++) {
+			number[i] = other.number[i];
+		}
 	}
 
 	~LongNumber()
@@ -48,17 +49,16 @@ public:
 
 	LongNumber& operator=(const LongNumber& other)
 	{
-		if (this != &other)
+		if (this != &other)														// проверка на самоприсваивание
 		{
-			delete[] number;
-
-			number = new int[other.size];
-
-			copy(other.number, other.number + other.size, number);
-			size = other.size;
+			delete[] number;													// очистка старой памяти
+			size = other.size;													// копирование размера
+			number = new int[other.size];										// выделение новой памяти	
+			for (size_t i = 0; i < size; i++) {
+				number[i] = other.number[i];									// копирование данных
+			}
 		}
-
-		return *this;
+		return *this;															// возврат ссылки на текущий объект
 	}
 
 	bool operator==(const LongNumber& other)
@@ -359,7 +359,7 @@ public:
 	}
 
 
-	void fromString(const string& str)
+	void fromStringToNumber(const string& str)
 	{
 		size = str.size();
 		number = new int[size];
@@ -380,10 +380,10 @@ public:
 		}
 	}
 
-	void fromInt(int n)
+	void fromNumberToString(int n)
 	{
 		string str = to_string(n);
-		fromString(str);
+		fromStringToNumber(str);
 	}
 
 	string toString() const
@@ -502,21 +502,21 @@ int main()
 
 	auto start = high_resolution_clock::now();
 
-	LongNumber a;
+	LongNumber a = 3257;
 	LongNumber result;
 
-	a.generateRandomNumber(5);
-	a.print();
+	/*a.generateRandomNumber(2);
+	a.print();*/
 
 	result.fermatFactorization(a);
 	// Засекаем время окончания
 	auto end = high_resolution_clock::now();
 
 	// Вычисляем продолжительность в секундах
-	auto duration = duration_cast<seconds> (end - start);
+	auto duration = duration_cast<nanoseconds> (end - start);
 
 	// Выводим время выполнения в секундах
-	cout << "Execution time: " << duration.count() << " seconds" << endl;
+	cout << "Execution time: " << duration.count() << " nanoseconds" << endl;
 
 	return 0;
 }
