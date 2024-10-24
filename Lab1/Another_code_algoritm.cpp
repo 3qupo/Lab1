@@ -49,16 +49,16 @@ public:
 
 	LongNumber& operator=(const LongNumber& other)
 	{
-		if (this != &other)														// проверка на самоприсваивание
+		if (this != &other)														
 		{
-			delete[] number;													// очистка старой памяти
-			size = other.size;													// копирование размера
-			number = new int[other.size];										// выделение новой памяти	
+			delete[] number;													
+			size = other.size;													
+			number = new int[other.size];											
 			for (size_t i = 0; i < size; i++) {
-				number[i] = other.number[i];									// копирование данных
+				number[i] = other.number[i];									
 			}
 		}
-		return *this;															// возврат ссылки на текущий объект
+		return *this;															
 	}
 
 	bool operator==(const LongNumber& other)
@@ -148,14 +148,14 @@ public:
 	LongNumber operator+(const LongNumber& other) const
 	{
 		LongNumber result;
-		int carry = 0;
+		size_t carry = 0;
 
-		result.size = max(size, other.size) + 1;
+		result.size = max(size , other.size) + 1;
 		result.number = new int[result.size];
 
 		for (int i = 0; i < max(size, other.size); i++)
 		{
-			int sum = carry;
+			size_t sum = carry;
 
 			if (i < size)
 			{
@@ -273,7 +273,6 @@ public:
 
 		for (int i = this->size - 1; i >= 0; i--)
 		{
-			// Добавляем текущий разряд к делимому
 			LongNumber temp = current;
 			temp.size++;
 			int* newNum = new int[temp.size];
@@ -286,13 +285,11 @@ public:
 			delete[] current.number;
 			current.number = newNum;
 
-			// Убираем ведущие нули
 			while (current.size > 1 && current.number[current.size - 1] == 0)
 			{
 				current.size--;
 			}
 
-			// Находим сколько раз other может быть вычтено из current
 			int count = 0;
 			while (current >= other)
 			{
@@ -303,7 +300,6 @@ public:
 			result.number[i] = count;
 		}
 
-		// Убираем ведущие нули в результате
 		while (result.size > 1 && result.number[result.size - 1] == 0)
 		{
 			result.size--;
@@ -324,7 +320,6 @@ public:
 
 		for (int i = this->size - 1; i >= 0; i--)
 		{
-			// Добавляем текущий разряд к делимому
 			LongNumber temp = current;
 			temp.size++;
 			int* newNum = new int[temp.size];
@@ -336,26 +331,23 @@ public:
 			delete[] current.number;
 			current.number = newNum;
 
-			// Убираем ведущие нули
 			while (current.size > 1 && current.number[current.size - 1] == 0)
 			{
 				current.size--;
 			}
 
-			// Вычитаем other из current, пока current >= other
 			while (current >= other)
 			{
 				current = current - other;
 			}
 		}
 
-		// Убираем ведущие нули
 		while (current.size > 1 && current.number[current.size - 1] == 0)
 		{
 			current.size--;
 		}
 
-		return current; // Остаток от деления
+		return current; 
 	}
 
 
@@ -421,20 +413,13 @@ public:
 
 	void generateRandomNumber(int length)
 	{
-		delete[] number; // Очищаем память для нового числа
-		size = length;
+		delete[] number; 
 		number = new int[size];
-
-		// Инициализируем генератор случайных чисел
 		srand(time(0));
-
-		// Генерация случайного длинного числа
 		for (int i = 0; i < size; i++)
 		{
-			number[i] = rand() % 10; // Генерация цифры от 0 до 9
+			number[i] = rand() % 10; 
 		}
-
-		// Проверяем, чтобы старшая цифра (последняя в массиве) не была нулем
 		while (number[size - 1] == 0)
 		{
 			number[size - 1] = rand() % 9 + 1; // Генерация цифры от 1 до 9
@@ -449,41 +434,34 @@ public:
 			cout << "Должно быть нечетное число" << endl;
 			return;
 		}
-		// Инициализация переменных
-		LongNumber x = n.sqrt1(n);	// Приближенное значение для корня из n
+
+		LongNumber x = n.sqrt1(n);
 		if (x * x == n)
 		{
-			// Если n — это точный квадрат
-			cout << "Factors: " << x.toString() << " *" << x.toString() << endl;
+			cout << "Factors: " << x.toString() << " * " << x.toString() << endl;
 			return;
 		}
 
-		LongNumber y("0");	// Начальное значение для y
+		LongNumber y("0");	
 		LongNumber x_squared = x * x;
 		LongNumber y_squared = y * y;
-		LongNumber diff = x_squared - y_squared;	// Разность квадратов
+		LongNumber diff = x_squared - y_squared;	
 
-		// Пока разность квадратов не станет равна n
 		while (diff != n)
 		{
 			if (diff > n)
 			{
-				// Если разность больше n, увеличиваем y
 				y = y + LongNumber("1");
-				y_squared = y * y;	// Обновляем y^2
+				y_squared = y * y;	
 			}
 			else
 			{
-				// Иначе увеличиваем x
 				x = x + LongNumber("1");
-				x_squared = x * x;	// Обновляем x^2
+				x_squared = x * x;	
 			}
-
-			// Пересчитываем разность квадратов
 			diff = x_squared - y_squared;
 		}
 
-		// Если мы вышли из цикла, значит нашли разложение
 		LongNumber factor1 = x - y;
 		LongNumber factor2 = x + y;
 		cout << "Factors: " << factor1.toString() << " * " << factor2.toString() << endl;
@@ -502,20 +480,20 @@ int main()
 
 	auto start = high_resolution_clock::now();
 
-	LongNumber a = 3257;
 	LongNumber result;
+	/*LongNumber num1 = 11;
+	LongNumber num2 = 22;
+	result = num1 + num2;
+	result.print();*/
+	LongNumber a;
 
-	/*a.generateRandomNumber(2);
-	a.print();*/
+	a.generateRandomNumber(8);
+	a.print();
 
 	result.fermatFactorization(a);
-	// Засекаем время окончания
+
 	auto end = high_resolution_clock::now();
-
-	// Вычисляем продолжительность в секундах
 	auto duration = duration_cast<nanoseconds> (end - start);
-
-	// Выводим время выполнения в секундах
 	cout << "Execution time: " << duration.count() << " nanoseconds" << endl;
 
 	return 0;
