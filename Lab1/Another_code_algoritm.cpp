@@ -1,5 +1,6 @@
 #include <iostream>
 #include <string>
+#include <fstream>	// for files
 #include <chrono>	// for time
 #include <cstdlib> // Для rand и srand
 
@@ -478,23 +479,43 @@ int main()
 {
 	setlocale(LC_ALL, "Russian");
 
-	auto start = high_resolution_clock::now();
-
 	LongNumber result;
-	/*LongNumber num1 = 11;
-	LongNumber num2 = 22;
-	result = num1 + num2;
-	result.print();*/
-	LongNumber a;
 
-	a.generateRandomNumber(8);
-	a.print();
+	ifstream file("Simple_numbers.txt");
+	if (!file.is_open()) {
+		cerr << "Ошибка: не удалось открыть файл." << endl;
+		return 1;
+	}
 
-	result.fermatFactorization(a);
+	LongNumber numbers[5];
+	string line;
 
-	auto end = high_resolution_clock::now();
-	auto duration = duration_cast<nanoseconds> (end - start);
-	cout << "Execution time: " << duration.count() << " nanoseconds" << endl;
+	for (int i = 0; i < 5 && getline(file, line); ++i) {
+		numbers[i] = LongNumber(line);
+	}
+	file.close();
+
+	cout << "Считанные числа:" << endl;
+	for (int i = 0; i < 5; ++i) {
+		numbers[i].print();
+	}
+
+	cout << endl;
+
+	for (int i = 0; i < 5; ++i) {
+		cout << "Факторизация числа " << i + 1 << ": ";
+		auto start = high_resolution_clock::now();
+
+		result.fermatFactorization(numbers[i]);
+
+		auto end = high_resolution_clock::now();
+		auto duration = duration_cast<milliseconds>(end - start);
+		cout << "Время выполнения: " << duration.count() << " миллисекунд" << endl;
+	}
+
+	// Будем использовать для демонстрации кода
+	/*a.generateRandomNumber(8);
+	a.print();*/
 
 	return 0;
 }
