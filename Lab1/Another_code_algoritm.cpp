@@ -64,35 +64,26 @@ public:
 
 	bool operator==(const LongNumber& other)
 	{
-		if (other.size == 0)
-		{
-			if (this->size == 0 || (this->size == 1 && this->number[0] == 0))
-			{
-				return true;
-			}
+		// Если оба числа пустые, они равны
+		if (this->size == 0 && other.size == 0)
+			return true;
 
+		// Если одно из чисел пустое, а другое нет, они не равны
+		if (this->size == 0 || other.size == 0)
 			return false;
-		}
-		else if (this->size == 0)
-		{
-			if (other.size == 1 && other.number[0] == 0)
-			{
-				return true;
-			}
 
+		// Если размеры чисел различаются, они не равны
+		if (this->size != other.size)
 			return false;
-		}
-		else if (other.size != this->size)
+
+		// Сравниваем каждый элемент
+		for (int i = 0; i < this->size; i++)
 		{
-			return false;
+			if (this->number[i] != other.number[i])
+				return false;
 		}
 
-		for (size_t i = 0; i < other.size; i++)
-		{
-			if (other.number[i] != this->number[i]) return false;
-		}
-
-		return true;
+		return true; // Все элементы совпадают
 	}
 
 	bool operator!=(const LongNumber& other)
@@ -181,6 +172,11 @@ public:
 			result.size--;
 		}
 
+		while (result.size > 1 && result.number[result.size - 1] == 0)
+		{
+			result.size--;
+		}
+
 		return result;
 	}
 
@@ -216,6 +212,7 @@ public:
 			result.number[i] = diff;
 		}
 
+		// убрали ведущие нули
 		while (result.size > 1 && result.number[result.size - 1] == 0)
 		{
 			result.size--;
@@ -229,6 +226,8 @@ public:
 		LongNumber result;
 		result.size = size + other.size;
 		result.number = new int[size + other.size];
+
+		// очищаем место для накопления сумм произведения
 		for (int i = 0; i < (size + other.size); i++)
 		{
 			result.number[i] = 0;
@@ -236,15 +235,15 @@ public:
 
 		for (int i = 0; i < size; i++)
 		{
-			int carry = 0;
+			size_t carry = 0;
 			for (int j = 0; j < other.size; j++)
 			{
-				int product = number[i] * other.number[j] +
-					result.number[i + j] + carry;
+				size_t product = number[i] * other.number[j] + result.number[i + j] + carry;
 				result.number[i + j] = product % 10;
 				carry = product / 10;
 			}
 
+			// перенос на следующий элемент после умножения всех разрядов
 			if (carry > 0)
 			{
 				result.number[i + other.size] += carry;
@@ -270,10 +269,12 @@ public:
 		LongNumber current;
 		current.size = 0;
 		result.size = this->size;
-		result.number = new int[result.size]();
+		result.number = new int[result.size](); // Инициализация массива нулями
 
 		for (int i = this->size - 1; i >= 0; i--)
 		{
+			// Сдвигаем текущий остаток влево на один разряд и добавляем следующую цифру
+			// Расширяем current на один разряд, добавляя текущий разряд из делимого
 			LongNumber temp = current;
 			temp.size++;
 			int* newNum = new int[temp.size];
@@ -281,11 +282,11 @@ public:
 			{
 				newNum[j] = current.number[j];
 			}
-
 			newNum[temp.size - 1] = this->number[i];
 			delete[] current.number;
 			current.number = newNum;
 
+			// Убираем ведущие нули в current
 			while (current.size > 1 && current.number[current.size - 1] == 0)
 			{
 				current.size--;
@@ -301,6 +302,7 @@ public:
 			result.number[i] = count;
 		}
 
+		// Убираем ведущие нули в результате
 		while (result.size > 1 && result.number[result.size - 1] == 0)
 		{
 			result.size--;
@@ -308,6 +310,7 @@ public:
 
 		return result;
 	}
+
 
 	LongNumber operator%(const LongNumber& other) const
 	{
@@ -356,7 +359,7 @@ public:
 	{
 		size = str.size();
 		number = new int[size];
-		for (int i = 0; i < str.size(); i++)
+		for (size_t i = 0; i < str.size(); i++)
 		{
 			number[i] = str[i] - '0';
 		}
@@ -382,7 +385,7 @@ public:
 	string toString() const
 	{
 		string str;
-		for (int i = size - 1; i >= 0; i--)
+		for (size_t i = size - 1; i >= 0; i--)
 		{
 			str += to_string(number[i]);
 		}
@@ -479,9 +482,14 @@ int main()
 {
 	setlocale(LC_ALL, "Russian");
 
+	LongNumber a = 10;
+	LongNumber b = 5;
 	LongNumber result;
 
-	ifstream file("Simple_numbers.txt");
+	if (a == b) cout << "Yes" << endl;
+	result.print();
+
+	/*ifstream file("Simple_numbers.txt");
 	if (!file.is_open()) {
 		cerr << "Ошибка: не удалось открыть файл." << endl;
 		return 1;
@@ -490,19 +498,19 @@ int main()
 	LongNumber numbers[5];
 	string line;
 
-	for (int i = 0; i < 5 && getline(file, line); ++i) {
+	for (size_t i = 0; i < 5 && getline(file, line); ++i) {
 		numbers[i] = LongNumber(line);
 	}
 	file.close();
 
 	cout << "Считанные числа:" << endl;
-	for (int i = 0; i < 5; ++i) {
+	for (size_t i = 0; i < 5; ++i) {
 		numbers[i].print();
 	}
 
 	cout << endl;
 
-	for (int i = 0; i < 5; ++i) {
+	for (size_t i = 0; i < 5; ++i) {
 		cout << "Факторизация числа " << i + 1 << ": ";
 		auto start = high_resolution_clock::now();
 
@@ -511,7 +519,7 @@ int main()
 		auto end = high_resolution_clock::now();
 		auto duration = duration_cast<milliseconds>(end - start);
 		cout << "Время выполнения: " << duration.count() << " миллисекунд" << endl;
-	}
+	}*/
 
 	// Будем использовать для демонстрации кода
 	/*a.generateRandomNumber(8);
