@@ -506,9 +506,13 @@ int main()
 {
 	setlocale(LC_ALL, "Russian");
 
+	LongNumber a = 100;
+	LongNumber b = 5;
 	LongNumber result;
+	result = a / b;
+	result.print();
 
-	ifstream file("Simple_numbers.txt");
+	/*ifstream file("Simple_numbers.txt");
 	if (!file.is_open()) {
 		cerr << "Ошибка: не удалось открыть файл." << endl;
 		return 1;
@@ -538,7 +542,7 @@ int main()
 		auto end = high_resolution_clock::now();
 		auto duration = duration_cast<milliseconds>(end - start);
 		cout << "Время выполнения: " << duration.count() << " миллисекунд" << endl;
-	}
+	}*/
 
 	// Будем использовать для демонстрации кода
 	//*a.generateRandomNumber(8);
