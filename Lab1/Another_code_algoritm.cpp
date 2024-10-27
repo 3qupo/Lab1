@@ -258,48 +258,61 @@ public:
 		return result;
 	}
 
-	LongNumber operator/(const LongNumber& other) const
+	LongNumber operator/(const LongNumber& other)
 	{
 		if (other.size == 0 || (other.size == 1 && other.number[0] == 0))
 		{
 			throw runtime_error("Division by zero");
 		}
 
+		// Если делимое меньше делителя, результат 0
+		if (*this < other)
+		{
+			return LongNumber("0");
+		}
+
+		// Если числа равны, результат 1
+		if (*this == other)
+		{
+			return LongNumber("1");
+		}
+
 		LongNumber result;
 		LongNumber current;
 		current.size = 0;
-		result.size = this->size;
-		result.number = new int[result.size](); // Инициализация массива нулями
+		result.size = size;
+		result.number = new int[result.size]();  // Инициализируем нулями
 
-		for (int i = this->size - 1; i >= 0; i--)
+		// Идем по цифрам делимого слева направо
+		for (int i = size - 1; i >= 0; i--)
 		{
-			// Сдвигаем текущий остаток влево на один разряд и добавляем следующую цифру
-			// Расширяем current на один разряд, добавляя текущий разряд из делимого
-			LongNumber temp = current;
-			temp.size++;
-			int* newNum = new int[temp.size];
-			for (int j = 0; j < temp.size - 1; j++)
+			// Сдвигаем текущее число влево и добавляем новую цифру
+			int* newNum = new int[current.size + 1];
+			for (int j = current.size - 1; j >= 0; j--)
 			{
-				newNum[j] = current.number[j];
+				newNum[j + 1] = current.number[j];
 			}
-			newNum[temp.size - 1] = this->number[i];
+			newNum[0] = number[i];
+
 			delete[] current.number;
 			current.number = newNum;
+			current.size++;
 
-			// Убираем ведущие нули в current
+			// Убираем ведущие нули
 			while (current.size > 1 && current.number[current.size - 1] == 0)
 			{
 				current.size--;
 			}
 
-			int count = 0;
-			while (current >= other)
+			// Подбираем максимальное число раз, которое делитель входит в текущее число
+			int quotient = 0;
+			while (!(current < other))
 			{
 				current = current - other;
-				count++;
+				quotient++;
 			}
 
-			result.number[i] = count;
+			result.number[i] = quotient;
 		}
 
 		// Убираем ведущие нули в результате
@@ -312,46 +325,57 @@ public:
 	}
 
 
-	LongNumber operator%(const LongNumber& other) const
+	LongNumber operator%(const LongNumber& other)
 	{
 		if (other.size == 0 || (other.size == 1 && other.number[0] == 0))
 		{
 			throw runtime_error("Division by zero");
 		}
 
+		// Если делимое меньше делителя, остаток равен делимому
+		if (*this < other)
+		{
+			return *this;
+		}
+
+		// Если числа равны, остаток 0
+		if (*this == other)
+		{
+			return LongNumber("0");
+		}
+
 		LongNumber current;
 		current.size = 0;
 
-		for (int i = this->size - 1; i >= 0; i--)
+		// Идем по цифрам делимого слева направо
+		for (int i = size - 1; i >= 0; i--)
 		{
-			LongNumber temp = current;
-			temp.size++;
-			int* newNum = new int[temp.size];
-			for (int j = 0; j < temp.size - 1; j++)
+			// Сдвигаем текущее число влево и добавляем новую цифру
+			int* newNum = new int[current.size + 1];
+			for (int j = current.size - 1; j >= 0; j--)
 			{
-				newNum[j] = current.number[j];
+				newNum[j + 1] = current.number[j];
 			}
-			newNum[temp.size - 1] = this->number[i];
+			newNum[0] = number[i];
+
 			delete[] current.number;
 			current.number = newNum;
+			current.size++;
 
+			// Убираем ведущие нули
 			while (current.size > 1 && current.number[current.size - 1] == 0)
 			{
 				current.size--;
 			}
 
-			while (current >= other)
+			// Вычитаем делитель максимальное возможное число раз
+			while (!(current < other))
 			{
 				current = current - other;
 			}
 		}
 
-		while (current.size > 1 && current.number[current.size - 1] == 0)
-		{
-			current.size--;
-		}
-
-		return current; 
+		return current;
 	}
 
 
@@ -385,7 +409,7 @@ public:
 	string toString() const
 	{
 		string str;
-		for (size_t i = size - 1; i >= 0; i--)
+		for (int i = size - 1; i >= 0; i--)
 		{
 			str += to_string(number[i]);
 		}
@@ -482,14 +506,7 @@ int main()
 {
 	setlocale(LC_ALL, "Russian");
 
-	LongNumber a = 10;
-	LongNumber b = 5;
-	LongNumber result;
-
-	if (a == b) cout << "Yes" << endl;
-	result.print();
-
-	/*ifstream file("Simple_numbers.txt");
+	ifstream file("Simple_numbers.txt");
 	if (!file.is_open()) {
 		cerr << "Ошибка: не удалось открыть файл." << endl;
 		return 1;
@@ -523,7 +540,7 @@ int main()
 
 	// Будем использовать для демонстрации кода
 	/*a.generateRandomNumber(8);
-	a.print();*/
+	a.print();
 
 	return 0;
 }
