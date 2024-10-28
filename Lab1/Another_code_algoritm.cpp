@@ -21,7 +21,7 @@ public:
         size = 0;
     }
 
-    LongNumber(string str)
+    LongNumber(const char* str)
     {
         number = nullptr;
         size = 0;
@@ -47,6 +47,7 @@ public:
     ~LongNumber()
     {
         delete[] number;
+        number = nullptr;
     }
 
     LongNumber& operator = (const LongNumber& other)
@@ -54,6 +55,7 @@ public:
         if (this != &other)
         {
             delete[] number;
+            number = nullptr;
             size = other.size;
             number = new int[other.size];
             for (size_t i = 0; i < size; i++) {
@@ -355,11 +357,11 @@ public:
     }
 
 
-    void fromStringToNumber(const string& str)
+    void fromStringToNumber(const char* str)
     {
-        size = str.size();
+        size = strlen(str);
         number = new int[size];
-        for (size_t i = 0; i < str.size(); i++)
+        for (size_t i = 0; i < size; i++)
         {
             number[i] = str[i] - '0';
         }
@@ -376,20 +378,38 @@ public:
         }
     }
 
-    void fromNumberToString(int n)
-    {
-        string str = to_string(n);
+    void fromNumberToString(int n) {
+        char str[12]; // Массив, достаточный для хранения int с возможным минусом и '\0'
+        int index = 0;
+
+        // Получение цифр в обратном порядке
+        int start = index;
+        do {
+            str[index++] = (n % 10) + '0';
+            n /= 10;
+        } while (n != 0);
+
+        // Переворот строки для правильного порядка
+        for (int i = start, j = index - 1; i < j; i++, j--) {
+            char temp = str[i];
+            str[i] = str[j];
+            str[j] = temp;
+        }
+
+        str[index] = '\0'; // Завершение строки символом конца строки
+
+        // Вызов функции fromStringToNumber
         fromStringToNumber(str);
     }
 
-    string toString() const
+    char* toString() const
     {
-        string str;
-        for (int i = size - 1; i >= 0; i--)
+        char* str = new char[size + 1];
+        for (int i = size - 1, j = 0; i >= 0; i--, j++)
         {
-            str += to_string(number[i]);
+            str[j] = number[i] + '0';
         }
-
+        str[size] = '\0';
         return str;
     }
 
@@ -418,6 +438,8 @@ public:
     void generateRandomNumber(int length)
     {
         delete[] number;
+        number = nullptr;
+        size = length;
         number = new int[size];
         srand(time(0));
         for (int i = 0; i < size; i++)
@@ -491,9 +513,9 @@ int main()
     }
 
     LongNumber numbers[5];
-    string line;
+    char line[1024];  // Буфер для хранения строки из файла
 
-    for (size_t i = 0; i < 5 && getline(file, line); ++i) {
+    for (size_t i = 0; i < 5 && file.getline(line, sizeof(line)); ++i) {
         numbers[i] = LongNumber(line);
     }
     file.close();
@@ -515,6 +537,21 @@ int main()
         auto duration = duration_cast<milliseconds>(end - start);
         cout << "Время выполнения: " << duration.count() << " миллисекунд" << endl;
     }
+
+    /*LongNumber a;
+    a.generateRandomNumber(4);
+    cout << "Сгенерированное число: ";
+    a.print();
+
+    auto start = high_resolution_clock::now();
+    cout << "Факторизация числа: ";
+    a.fermatFactorization(a);
+
+    auto end = high_resolution_clock::now();
+
+    auto duration = duration_cast<milliseconds>(end - start);
+    cout << "Время выполнения: " << duration.count() << " миллисекунд" << endl;
+    */
 
     return 0;
 }
