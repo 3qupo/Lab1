@@ -483,14 +483,6 @@ int main()
 {
     setlocale(LC_ALL, "Russian");
 
-    LongNumber a = 1;
-    LongNumber b = 2;
-    if (a < b) cout << "Yes" << endl;
-    else
-    {
-        cout << "No" << endl;
-    }
-
     LongNumber result;
     ifstream file("Simple_numbers.txt");
     if (!file.is_open()) {
