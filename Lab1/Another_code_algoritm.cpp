@@ -49,7 +49,7 @@ public:
         delete[] number;
     }
 
-    LongNumber& operator=(const LongNumber& other)
+    LongNumber& operator = (const LongNumber& other)
     {
         if (this != &other)
         {
@@ -63,7 +63,7 @@ public:
         return *this;
     }
 
-    bool operator==(const LongNumber& other)
+    bool operator == (const LongNumber& other)
     {
         if (this->size != other.size)
             return false;
@@ -77,7 +77,7 @@ public:
         return true;
     }
 
-    bool operator!=(const LongNumber& other)
+    bool operator != (const LongNumber& other)
     {
         bool result = !(this->operator==(other));
 
@@ -96,39 +96,39 @@ public:
             return this->size < other.size;
         }
         
-        for (size_t i = this->size - 1; i < this->size; i--) 
+        for (size_t i = this->size; i > 0; i--)
         {
-            if (this->number[i] != other.number[i])
+            if (this->number[i - 1] != other.number[i - 1])
             {
-                return this->number[i] < other.number[i];
+                return this->number[i - 1] < other.number[i - 1];
             }
         }
 
         return false;
     }
 
-    bool operator<=(const LongNumber& other)
+    bool operator <= (const LongNumber& other)
     {
         bool result = (this->operator==(other) || this->operator < (other));
 
         return result;
     }
 
-    bool operator>(const LongNumber& other)
+    bool operator > (const LongNumber& other)
     {
         bool result = !(this->operator<=(other));
 
         return result;
     }
 
-    bool operator>=(const LongNumber& other)
+    bool operator >= (const LongNumber& other)
     {
         bool result = !(this->operator < (other));
 
         return result;
     }
 
-    LongNumber operator+(const LongNumber& other) const
+    LongNumber operator + (const LongNumber& other) const
     {
         LongNumber result;
         size_t shift = 0;
@@ -211,7 +211,7 @@ public:
         return result;
     }
 
-    LongNumber operator*(const LongNumber& other) const
+    LongNumber operator * (const LongNumber& other) const
     {
         LongNumber result;
         result.size = size + other.size;
@@ -247,7 +247,7 @@ public:
         return result;
     }
 
-    LongNumber operator/(const LongNumber& other)
+    LongNumber operator / (const LongNumber& other)
     {
         if (other.size == 0 || (other.size == 1 && other.number[0] == 0))
         {
@@ -307,7 +307,7 @@ public:
     }
 
 
-    LongNumber operator%(const LongNumber& other)
+    LongNumber operator % (const LongNumber& other)
     {
         if (other.size == 0 || (other.size == 1 && other.number[0] == 0))
         {
@@ -482,6 +482,14 @@ public:
 int main()
 {
     setlocale(LC_ALL, "Russian");
+
+    LongNumber a = 1;
+    LongNumber b = 2;
+    if (a < b) cout << "Yes" << endl;
+    else
+    {
+        cout << "No" << endl;
+    }
 
     LongNumber result;
     ifstream file("Simple_numbers.txt");
