@@ -503,6 +503,8 @@ int main()
 {
     setlocale(LC_ALL, "Russian");
 
+    cout << "Check" << endl;
+
     LongNumber result;
     ifstream file("Simple_numbers.txt");
     if (!file.is_open()) {
