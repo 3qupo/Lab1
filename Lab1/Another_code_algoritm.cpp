@@ -11,7 +11,7 @@ using namespace std::chrono;
 class LongNumber
 {
 private:
-    int* number;
+    char* number;
     int size;
 
 public:
@@ -38,7 +38,7 @@ public:
     LongNumber(const LongNumber& other)
     {
         size = other.size;
-        number = new int[size];
+        number = new char[size];
         for (size_t i = 0; i < size; i++) {
             number[i] = other.number[i];
         }
@@ -57,7 +57,7 @@ public:
             delete[] number;
             number = nullptr;
             size = other.size;
-            number = new int[other.size];
+            number = new char[other.size];
             for (size_t i = 0; i < size; i++) {
                 number[i] = other.number[i];
             }
@@ -97,7 +97,7 @@ public:
         {
             return this->size < other.size;
         }
-        
+
         for (size_t i = this->size; i > 0; i--)
         {
             if (this->number[i - 1] != other.number[i - 1])
@@ -136,7 +136,7 @@ public:
         size_t shift = 0;
 
         result.size = max(size, other.size) + 1;
-        result.number = new int[result.size];
+        result.number = new char[result.size];
 
         for (int i = 0; i < max(size, other.size); i++)
         {
@@ -177,7 +177,7 @@ public:
     {
         LongNumber result;
         result.size = max(size, other.size);
-        result.number = new int[result.size]();
+        result.number = new char[result.size]();
         int shift = 0;
         for (int i = 0; i < result.size; i++)
         {
@@ -217,13 +217,12 @@ public:
     {
         LongNumber result;
         result.size = size + other.size;
-        result.number = new int[size + other.size];
+        result.number = new char[size + other.size];
 
         for (int i = 0; i < (size + other.size); i++)
         {
             result.number[i] = 0;
         }
-
 
         for (int i = 0; i < size; i++)
         {
@@ -270,11 +269,11 @@ public:
         LongNumber current;
         current.size = 0;
         result.size = size;
-        result.number = new int[result.size]();
+        result.number = new char[result.size]();
 
         for (int i = size - 1; i >= 0; i--)
         {
-            int* newNum = new int[current.size + 1];
+            char* newNum = new char[current.size + 1];
             for (int j = current.size - 1; j >= 0; j--)
             {
                 newNum[j + 1] = current.number[j];
@@ -331,7 +330,7 @@ public:
 
         for (int i = size - 1; i >= 0; i--)
         {
-            int* newNum = new int[current.size + 1];
+            char* newNum = new char[current.size + 1];
             for (int j = current.size - 1; j >= 0; j--)
             {
                 newNum[j + 1] = current.number[j];
@@ -360,7 +359,7 @@ public:
     void fromStringToNumber(const char* str)
     {
         size = strlen(str);
-        number = new int[size];
+        number = new char[size];
         for (size_t i = 0; i < size; i++)
         {
             number[i] = str[i] - '0';
@@ -440,7 +439,7 @@ public:
         delete[] number;
         number = nullptr;
         size = length;
-        number = new int[size];
+        number = new char[size];
         srand(time(0));
         for (int i = 0; i < size; i++)
         {
@@ -504,52 +503,55 @@ int main()
     setlocale(LC_ALL, "Russian");
 
     LongNumber result;
-    ifstream file("Simple_numbers.txt");
-    if (!file.is_open()) {
-        cerr << "Ошибка: не удалось открыть файл." << endl;
-        return 1;
-    }
+    LongNumber a = "1364463513251";
+    result.fermatFactorization(a);
 
-    LongNumber numbers[5];
-    char line[1024];  // Буфер для хранения строки из файла
+    //ifstream file("Simple_numbers.txt");
+    //if (!file.is_open()) {
+    //    cerr << "Ошибка: не удалось открыть файл." << endl;
+    //    return 1;
+    //}
 
-    for (size_t i = 0; i < 5 && file.getline(line, sizeof(line)); ++i) {
-        numbers[i] = LongNumber(line);
-    }
-    file.close();
+    //LongNumber numbers[5];
+    //char line[1024];  // Буфер для хранения строки из файла
 
-    cout << "Считанные числа:" << endl;
-    for (size_t i = 0; i < 5; ++i) {
-        numbers[i].print();
-    }
+    //for (size_t i = 0; i < 5 && file.getline(line, sizeof(line)); ++i) {
+    //    numbers[i] = LongNumber(line);
+    //}
+    //file.close();
 
-    cout << endl;
+    //cout << "Считанные числа:" << endl;
+    //for (size_t i = 0; i < 5; ++i) {
+    //    numbers[i].print();
+    //}
 
-    for (size_t i = 0; i < 5; ++i) {
-        cout << "Факторизация числа " << i + 1 << ": ";
-        auto start = high_resolution_clock::now();
+    //cout << endl;
 
-        result.fermatFactorization(numbers[i]);
+    //for (size_t i = 0; i < 5; ++i) {
+    //    cout << "Факторизация числа " << i + 1 << ": ";
+    //    auto start = high_resolution_clock::now();
 
-        auto end = high_resolution_clock::now();
-        auto duration = duration_cast<milliseconds>(end - start);
-        cout << "Время выполнения: " << duration.count() << " миллисекунд" << endl;
-    }
+    //    result.fermatFactorization(numbers[i]);
 
-    LongNumber a;
-    a.generateRandomNumber(5);
-    cout << "Сгенерированное число: ";
-    a.print();
+    //    auto end = high_resolution_clock::now();
+    //    auto duration = duration_cast<milliseconds>(end - start);
+    //    cout << "Время выполнения: " << duration.count() << " миллисекунд" << endl;
+    //}
 
-    auto start = high_resolution_clock::now();
-    cout << "Факторизация числа: ";
-    a.fermatFactorization(a);
+    //LongNumber a;
+    //a.generateRandomNumber(5);
+    //cout << "Сгенерированное число: ";
+    //a.print();
 
-    auto end = high_resolution_clock::now();
+    //auto start = high_resolution_clock::now();
+    //cout << "Факторизация числа: ";
+    //a.fermatFactorization(a);
 
-    auto duration = duration_cast<milliseconds>(end - start);
-    cout << "Время выполнения: " << duration.count() << " миллисекунд" << endl;
-    
+    //auto end = high_resolution_clock::now();
+
+    //auto duration = duration_cast<milliseconds>(end - start);
+    //cout << "Время выполнения: " << duration.count() << " миллисекунд" << endl;
+
 
     return 0;
 }
