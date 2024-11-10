@@ -475,22 +475,53 @@ public:
         return b;
     }
 
-    // На 1 поднимает вверх
+    //// На 1 поднимает вверх
+    //LongNumber sqrt1(LongNumber n)
+    //{
+    //    LongNumber i("1");
+    //    while (i <= n)
+    //    {
+    //        if ((i * i) >= n)
+    //        {
+    //            return i;
+    //        }
+    //        else
+    //        {
+    //            i = i + LongNumber("1");
+    //        }
+    //    }
+    //}
+
+    // Оставить это, работает отлично, но теперь алгоритм не работает (или работает?)
     LongNumber sqrt1(LongNumber n)
     {
-        LongNumber i("1");
-        while (i <= n)
+        if (n == LongNumber("0"))
+            return LongNumber("0");
+
+        LongNumber low("1");
+        LongNumber high = n;
+        LongNumber mid;
+        LongNumber midSquared;
+
+        while (low <= high)
         {
-            if ((i * i) >= n)
-            {
-                return i;
-            }
+            // Вычисляем середину
+            mid = (low + high) / LongNumber("2");
+
+            // mid^2
+            midSquared = mid * mid;
+
+            if (midSquared == n)
+                return mid;  // нашли точный корень
+            else if (midSquared < n)
+                low = mid + LongNumber("1");  // ищем в правой половине
             else
-            {
-                i = i + LongNumber("1");
-            }
+                high = mid - LongNumber("1");  // ищем в левой половине
         }
+
+        return high;  // В конце high будет максимальным числом, чьи квадрат меньше или равен n
     }
+
 
     void generateRandomNumber(int length)
     {
@@ -562,8 +593,12 @@ int main()
     setlocale(LC_ALL, "Russian");
 
     LongNumber result;
-    LongNumber a = "102 564 555 31";
+    LongNumber a = "111 111 111 111 111 111 113";
+    auto start = high_resolution_clock::now();
     result.fermatFactorization(a);
+    auto end = high_resolution_clock::now();
+    auto duration = duration_cast<milliseconds>(end - start);
+    cout << "Время выполнения: " << duration.count() << " миллисекунд" << endl;
 
     //ifstream file("Simple_numbers.txt");
     //if (!file.is_open()) {
