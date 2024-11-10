@@ -1,8 +1,5 @@
-// This is a personal academic project. Dear PVS-Studio, please check it.
-// PVS-Studio Static Code Analyzer for C, C++, C#, and Java: https://pvs-studio.com
-
 #include <iostream>
-#include <string>
+#include <cstring>
 #include <fstream>   // for files
 #include <chrono>  // for time
 #include <cstdlib> // Для rand и srand
@@ -15,128 +12,101 @@ class LongNumber
 private:
     char* number;
     int size;
-    int length;
 
 public:
     LongNumber()
     {
         number = nullptr;
         size = 0;
-        length = 0;
     }
 
     LongNumber(const char* str)
     {
-        if (str == nullptr) {
-            throw invalid_argument("String pointer is null!");
-        }
-
-        length = 0;
-        while (str[length] != '\0') length++;
-        size = length + 1;
-        number = new char[size];
-        int result = length;
-
-        for (int i = 0; i < length; i++) {
-            number[i] = str[result - 1];
-            result--;
-        }
-
-        number[size - 1] = '\0';
+        number = nullptr;
+        size = 0;
+        fromStringToNumber(str);
     }
 
     LongNumber(int n)
     {
         number = nullptr;
         size = 0;
-        length = 0;
         fromNumberToString(n);
     }
 
     LongNumber(const LongNumber& other)
     {
-        length = other.length;
         size = other.size;
         number = new char[size];
-        for (size_t i = 0; i < length; i++) {
+        for (size_t i = 0; i < size; i++) {
             number[i] = other.number[i];
         }
-        number[length] = '\0';
     }
 
     ~LongNumber()
     {
         delete[] number;
         number = nullptr;
-        length = 0;
-        size = 0;
     }
+    
+    //// Не мои операторы
+    ////Оператор строго меньше<
+    //bool operator < (const LongNumber& other) const {
+    //    if (size < other.size) return true;
+    //    if (size > other.size) return false;
+    //    for (int i = size; i > 0; i--) {
+    //        if (number[i - 1] < other.number[i - 1])
+    //            return true;
+    //        if (number[i - 1] > other.number[i - 1])
+    //            return false;
+    //    }
 
-    int GetLength() const {
-        return length;
-    }
+    //    return false;
+    //}
 
-    /*void enscure_size(int new_length)
-    {
-        size = new_length + 1;
-        char* new_number = new char[size];
-        for (int i = 0; i < length; i++)
-        {
-            new_number[i] = number[i];
-        }
-        for (int i = length; i < new_length; i++)
-        {
-            new_number[i] = '0';
-        }
-        delete[] number;
-        number = new_number;
-        number[size - 1] = '\0';
-    }*/
+    ////Оператор строго больше > 
+    //bool operator > (const LongNumber& other) const {
+    //    return other < *this;
+    //}
 
+    ////Оператор меньше либо равно <= 
+    //bool operator <= (const LongNumber& other) const {
+    //    return !(*this > other);
+    //}
 
-    // Перевыделение памяти
-    void enscure_size(int new_length)
-    {
-        size = new_length + 1;
-        char* new_number = new char[size];
-        for (int i = 0; i < new_length; i++)
-        {
-            if (i < length) new_number[i] = number[i];
-            else new_number[i] = '0';
-        }
+    ////Оператор больше либо равно >= 
+    //bool operator >= (const LongNumber& other) const {
+    //    return !(*this < other);
+    //}
 
-        new_number[length] = '\0';
-        delete[] number;
-        number = new char[size];
-        for (int i = 0; i < length; i = i + 1)
-        {
-            number[i] = new_number[i];
-        }
+    ////Оператор равно == 
+    //bool operator == (const LongNumber& other) const {
+    //    if (size != other.size) return false;
+    //    for (int i = 0; i < size; i++)
+    //    {
+    //        if (number[i] != other.number[i]) return false;
+    //    }
 
-        delete[] new_number;
-    }
+    //    return true;
+    //}
 
-    int my_strlen(const char* str)
-    {
-        length = 0;
-        while (str[length] != '\0') length++;
-        return length;
-    }
+    ////Оператор не равно != 
+    //bool operator != (const LongNumber& other) const {
+    //    return !(*this == other);
+    //}
 
     LongNumber& operator = (const LongNumber& other)
     {
-        if (this == &other) return *this;
-
-        length = other.length;
-        size = other.size;
-
-        delete[] number;
-
-        number = new char[size]; // size or length?
-
-        for (int i = 0; i < length; i++) number[i] = other.number[i];
-        number[length] = '\0';
-
+        if (this != &other)
+        {
+            delete[] number;
+            number = nullptr;
+            size = other.size;
+            number = new char[other.size];
+            for (size_t i = 0; i < size; i++) {
+                number[i] = other.number[i];
+            }
+        }
         return *this;
     }
 
@@ -205,212 +175,288 @@ public:
         return result;
     }
 
-    LongNumber operator + (const LongNumber& others)
+    LongNumber operator + (const LongNumber& other) const
     {
-        LongNumber other = others;
-        if (*this < others)
+        LongNumber result;
+        size_t shift = 0;
+
+        result.size = max(size, other.size) + 1;
+        result.number = new char[result.size];
+
+        for (int i = 0; i < max(size, other.size); i++)
         {
-            other = *this;
-            *this = others;
+            size_t sum = shift;
+
+            if (i < size)
+            {
+                sum += number[i];
+            }
+
+            if (i < other.size)
+            {
+                sum += other.number[i];
+            }
+
+            result.number[i] = sum % 10;
+            shift = sum / 10;
         }
 
-        int max_size_sum = max(length, other.length) + 1;
-        enscure_size(max_size_sum);
-
-        int carry = 0;
-        for (int i = 0; i < length + 1; i++)
+        if (shift != 0)
         {
-            int storage1 = (i < length) ? (number[i] - '0') : 0;
-            int storage2 = (i < other.length) ? (other.number[i] - '0') : 0;
-            int sum = storage1 + storage2 + carry;
-
-            carry = sum / 10;
-            number[i] = (sum % 10) + '0';
+            result.number[max(size, other.size)] = shift;
         }
-
-        if (number[length] != '0') length++;
-        else enscure_size(length);
-        
-        number[length] = '\0';
-
-        return *this;
-    }
-
-    LongNumber operator-(const LongNumber& other)
-    {
-        if (*this < other) throw invalid_argument("Error!");
-        if (*this == other)
-        {
-            LongNumber temp("0");
-            *this = temp;
-        }
-
         else
         {
-            int borrow = 0;
-            for (int i = 0; i < length; i++)
-            {
-                int digit1 = (i < length) ? (number[i] - '0') : 0;
-                int digit2 = (i < other.length) ? (other.number[i] - '0') : 0;
-                int diff = digit1 - digit2 - borrow;
-
-                borrow = (diff < 0) ? 1 : 0;
-                if (borrow) diff += 10;
-                number[i] = diff + '0';
-            }
-
-            int leading_zero = -1;
-            for (int i = length; i > 0; i--)
-            {
-                if (number[i - 1] == '0') leading_zero += 1;
-                else break;
-            }
-
-            if (leading_zero != -1)
-            {
-                length = length - leading_zero - 1;
-                enscure_size(length);
-            }
-            else number[length] = '\0';
+            result.size--;
         }
 
-        return *this;
-    }
-
-    LongNumber operator * (LongNumber& other)
-    {
-        if ((*this == LongNumber("0")) || (other == LongNumber("0"))) *this = LongNumber("0");
-        else
+        while (result.size > 1 && result.number[result.size - 1] == 0)
         {
-            LongNumber result(length + other.length);
-
-            for (int i = 0; i < length; i++)
-            {
-                int carry = 0;
-                for (int j = 0; j < other.length; j++)
-                {
-                    int digit1 = number[i] - '0';
-                    int digit2 = other.number[j] - '0';
-                    int current_result = result.number[i + j] - '0';
-                    int mul = digit1 * digit2 + carry + current_result;
-
-                    result.number[i + j] = (mul % 10) + '0';
-                    carry = mul / 10;
-                }
-
-                result.number[i + other.length] += carry;
-            }
-
-            int leading_zero = -1;
-            for (int i = result.length; i > 0; i--)
-            {
-                if (result.number[i - 1] == '0') leading_zero++;
-                else break;
-            }
-
-            if (leading_zero != -1)
-            {
-                result.length = result.length - leading_zero - 1;
-                result.enscure_size(result.length);
-            }
-            else result.number[result.length] = '\0';
-
-            *this = result;
+            result.size--;
         }
 
-        return *this;
+        return result;
     }
 
-    LongNumber operator / (LongNumber& divisor)
+    LongNumber operator-(const LongNumber& other) const
     {
-        // Проверка деления на ноль
-        if (divisor == LongNumber("0")) {
-            throw std::invalid_argument("Division by zero");
+        LongNumber result;
+        result.size = max(size, other.size);
+        result.number = new char[result.size]();
+        int shift = 0;
+        for (int i = 0; i < result.size; i++)
+        {
+            int diff = shift;
+            if (i < size)
+            {
+                diff += number[i];
+            }
+
+            if (i < other.size)
+            {
+                diff -= other.number[i];
+            }
+
+            if (diff < 0)
+            {
+                diff += 10;
+                shift = -1;
+            }
+            else
+            {
+                shift = 0;
+            }
+
+            result.number[i] = diff;
         }
 
-        // Если делимое меньше делителя, результат деления будет 0
-        if (*this < divisor) {
+        while (result.size > 1 && result.number[result.size - 1] == 0)
+        {
+            result.size--;
+        }
+
+        return result;
+    }
+
+    LongNumber operator * (const LongNumber& other) const
+    {
+        LongNumber result;
+        result.size = size + other.size;
+        result.number = new char[size + other.size];
+
+        for (int i = 0; i < (size + other.size); i++)
+        {
+            result.number[i] = 0;
+        }
+
+        for (int i = 0; i < size; i++)
+        {
+            size_t shift = 0;
+            for (int j = 0; j < other.size; j++)
+            {
+                size_t product = number[i] * other.number[j] + result.number[i + j] + shift;
+                result.number[i + j] = product % 10;
+                shift = product / 10;
+            }
+
+            if (shift > 0)
+            {
+                result.number[i + other.size] += shift;
+            }
+        }
+
+        while (result.size > 1 && result.number[result.size - 1] == 0)
+        {
+            result.size--;
+        }
+
+        return result;
+    }
+
+    LongNumber operator / (const LongNumber& other)
+    {
+        if (other.size == 0 || (other.size == 1 && other.number[0] == 0))
+        {
+            throw runtime_error("Division by zero");
+        }
+
+        if (*this < other)
+        {
             return LongNumber("0");
         }
 
-        // Если делимое и делитель равны, результат деления — 1
-        if (*this == divisor) {
+        if (*this == other)
+        {
             return LongNumber("1");
         }
 
-        // Инициализация текущего значения делимого и результата
-        LongNumber remainder = *this;
-        LongNumber quotient("0");
+        LongNumber result;
+        LongNumber current;
+        current.size = 0;
+        result.size = size;
+        result.number = new char[result.size]();
 
-        // Повторяем вычитание делителя, пока остаток больше или равен делителю
-        while (!(remainder < divisor)) {
-            remainder = remainder - divisor;
-            quotient = quotient + LongNumber("1");  // Увеличиваем результат на 1
+        for (int i = size - 1; i >= 0; i--)
+        {
+            char* newNum = new char[current.size + 1];
+            for (int j = current.size - 1; j >= 0; j--)
+            {
+                newNum[j + 1] = current.number[j];
+            }
+            newNum[0] = number[i];
+
+            delete[] current.number;
+            current.number = newNum;
+            current.size++;
+
+            while (current.size > 1 && current.number[current.size - 1] == 0)
+            {
+                current.size--;
+            }
+
+            int quotient = 0;
+            while (!(current < other))
+            {
+                current = current - other;
+                quotient++;
+            }
+
+            result.number[i] = quotient;
         }
 
-        // Возвращаем результат целочисленного деления
-        return quotient;
+        while (result.size > 1 && result.number[result.size - 1] == 0)
+        {
+            result.size--;
+        }
+
+        return result;
     }
 
-    LongNumber operator % (const LongNumber& divisor) {
 
-        // If the dividend is smaller than the divisor, the remainder is the dividend itself
-        if (*this < divisor) {
+    LongNumber operator % (const LongNumber& other)
+    {
+        if (other.size == 0 || (other.size == 1 && other.number[0] == 0))
+        {
+            throw runtime_error("Division by zero");
+        }
+
+        if (*this < other)
+        {
             return *this;
         }
 
-        // If the numbers are equal, the remainder is zero
-        if (*this == divisor) {
+        if (*this == other)
+        {
             return LongNumber("0");
         }
 
-        // Initialize the remainder with a copy of the current object (dividend)
-        LongNumber remainder = *this;
+        LongNumber current;
+        current.size = 0;
 
-        // Repeatedly subtract the divisor from the remainder until it's less than the divisor
-        while (!(remainder < divisor)) {
-            remainder = remainder - divisor;
+        for (int i = size - 1; i >= 0; i--)
+        {
+            char* newNum = new char[current.size + 1];
+            for (int j = current.size - 1; j >= 0; j--)
+            {
+                newNum[j + 1] = current.number[j];
+            }
+            newNum[0] = number[i];
+
+            delete[] current.number;
+            current.number = newNum;
+            current.size++;
+
+            while (current.size > 1 && current.number[current.size - 1] == 0)
+            {
+                current.size--;
+            }
+
+            while (!(current < other))
+            {
+                current = current - other;
+            }
         }
 
-        // The remainder now holds the modulus result
-        return remainder;
+        return current;
     }
+
 
     void fromStringToNumber(const char* str)
     {
-        length = strlen(str);
-        size = length + 1;
-        number = new char[size];
-        for (int i = 0; i < length; i++) {
-            number[i] = str[length - i - 1];
+        size = strlen(str);
+        delete[] number;         // Освобождаем память, если number уже указывает на выделенный массив
+        number = new char[size];  // Выделяем память для числа
+
+        // Заполняем массив в обратном порядке и преобразуем символы в числа
+        for (int i = 0; i < size; i++) {
+            number[i] = str[size - i - 1] - '0';  // Преобразуем символ в число
         }
-        number[length] = '\0';
     }
 
-    void fromNumberToString(int n) 
-    {
-        char str[12]; // Массив, достаточный для хранения int с возможным минусом и '\0'
-        int index = 0;
-
-        // Получение цифр в обратном порядке
-        int start = index;
+    void fromNumberToString(int n) {
+        // Определяем размер числа
+        int temp = n;
+        size = 0;
         do {
-            str[index++] = (n % 10) + '0';
+            temp /= 10;
+            size++;
+        } while (temp != 0);
+
+        // Освобождаем память, если number уже указывает на выделенный массив
+        delete[] number;
+        number = new char[size];
+
+        // Записываем цифры числа n в массив number в обратном порядке
+        for (int i = 0; i < size; i++) {
+            number[i] = (n % 10);
             n /= 10;
-        } while (n != 0);
-
-        // Переворот строки для правильного порядка
-        for (int i = start, j = index - 1; i < j; i++, j--) {
-            char temp = str[i];
-            str[i] = str[j];
-            str[j] = temp;
         }
-
-        str[index] = '\0'; // Завершение строки символом конца строки
-
-        // Вызов функции fromStringToNumber
-        fromStringToNumber(str);
     }
+
+
+    //void fromNumberToString(int n) {
+    //    char str[12]; // Массив, достаточный для хранения int с возможным минусом и '\0'
+    //    int index = 0;
+
+    //    // Получение цифр в обратном порядке
+    //    int start = index;
+    //    do {
+    //        str[index++] = (n % 10) + '0';
+    //        n /= 10;
+    //    } while (n != 0);
+
+    //    // Переворот строки для правильного порядка
+    //    for (int i = start, j = index - 1; i < j; i++, j--) {
+    //        char temp = str[i];
+    //        str[i] = str[j];
+    //        str[j] = temp;
+    //    }
+
+    //    str[index] = '\0'; // Завершение строки символом конца строки
+
+    //    // Вызов функции fromStringToNumber
+    //    fromStringToNumber(str);
+    //}
 
     char* toString() const
     {
@@ -429,69 +475,28 @@ public:
         return b;
     }
 
-    LongNumber sqrt1(LongNumber n) 
+    // На 1 поднимает вверх
+    LongNumber sqrt1(LongNumber n)
     {
-        // Если n = 0 или n = 1, возвращаем само число
-        if (n == LongNumber("0") || n == LongNumber("1")) {
-            return n;
-        }
-
-        LongNumber left("1");
-        LongNumber right = n;
-        LongNumber result("0");
-        LongNumber two("2");
-
-        while (left <= right) 
+        LongNumber i("1");
+        while (i <= n)
         {
-            LongNumber mid = (left + right) / two;  // Находим середину
-
-            // Проверяем, если mid^2 == n
-            LongNumber square = mid * mid;
-            if (square == n) {
-                return mid;
+            if ((i * i) >= n)
+            {
+                return i;
             }
-
-            // Если mid^2 < n, сохраняем результат и передвигаем левую границу
-            if (square < n) {
-                result = mid;
-                left = mid + LongNumber("1");  // Увеличиваем left
-            }
-            // Если mid^2 > n, передвигаем правую границу
-            else {
-                right = mid - LongNumber("1");
+            else
+            {
+                i = i + LongNumber("1");
             }
         }
-
-        // Возвращаем результат, который является целой частью квадратного корня
-        return result;
     }
 
-
-
-    //// Надо переделать (сделать бинарно)
-    //LongNumber sqrt1(LongNumber n)
-    //{
-    //    LongNumber i("1");
-    //    while (i <= n)
-    //    {
-    //        if ((i * i) >= n)
-    //        {
-    //            return i;
-    //        }
-    //        else
-    //        {
-    //            i = i + LongNumber("1");
-    //        }
-    //    }
-
-    //    return *this;
-    //}
-
-    void generateRandomNumber(int length1)
+    void generateRandomNumber(int length)
     {
         delete[] number;
         number = nullptr;
-        size = length1;
+        size = length;
         number = new char[size];
         srand(time(0));
         for (int i = 0; i < size; i++)
@@ -504,16 +509,16 @@ public:
         }
     }
 
-    void fermatFactorization(LongNumber& a) 
-    {
-        LongNumber result;
+
+    void fermatFactorization(LongNumber& a) {
+
         if (a.endelim() == 0) {
             cout << "Число должно быть нечётным для факторизации методом Ферма." << endl;
             return;
         }
 
-        LongNumber x = result.sqrt1(a);
-        x.print();
+        LongNumber x = a.sqrt1(a);
+        cout << "Корень числа: " << x.toString() << endl;
         if (x * x == a) {
             cout << "Факторы: " << x.toString() << " * " << x.toString() << endl;
             return;
@@ -521,9 +526,7 @@ public:
 
         LongNumber y("0");
         LongNumber R = x * x - y * y;
-        LongNumber res1("2");
-        LongNumber res2("1");
-        LongNumber Rx = x * res1 + res2;
+        LongNumber Rx = x * LongNumber("2") + LongNumber("1");
         LongNumber Ry = LongNumber("1");
 
         while (R != a) {
@@ -559,12 +562,8 @@ int main()
     setlocale(LC_ALL, "Russian");
 
     LongNumber result;
-    LongNumber resultnumber;
-    LongNumber a = 1098751;
-    LongNumber b = 20;
-
-    resultnumber = result.sqrt1(b);
-    resultnumber.print();
+    LongNumber a = "102 564 555 31";
+    result.fermatFactorization(a);
 
     //ifstream file("Simple_numbers.txt");
     //if (!file.is_open()) {
@@ -611,6 +610,7 @@ int main()
 
     //auto duration = duration_cast<milliseconds>(end - start);
     //cout << "Время выполнения: " << duration.count() << " миллисекунд" << endl;
+
 
     return 0;
 }
